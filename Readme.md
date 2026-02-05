@@ -39,7 +39,7 @@ From this folder:
 - Discrete Slam Action (in platformer mode) which allows the player to slam back to the ground.
 - The player must be off ground, in platformer mode, and meeting the SLAM_FALL_REQUIREMENT
 - The constant "SLAM_FALL_REQUIREMENT" is the minimum y velocity that the player must have in order to slam. I initially had it as just 0 but this felt clunky where often times if slam pressed too early nothing happens. This is to prevent the use of slam during most of the rise of the jump. 
-- During the slam, the player becomes thinner and taller to give some visual feedback that the player is slamming
+- During the slam, the player becomes thinner and taller to give some visual feedback that the player is slamming down fast
 - Added a multi-jump feature, the amount of jumps is controlled by "JUMPS" constant. Multi jumps give less height compared to grounded jumps this is controlled by "MULTI_JUMP_DIMINISH" factor
 - Multi jump count resets upon touching the ground. Multi jump count also added to HUD
 
@@ -47,5 +47,5 @@ From this folder:
 - Icey (Use `4` to toggle preset) 
     - The Main parameter changed here is the friction.  This gives a more slippery feel. I was aiming for how Luigi feels particularly in Super Smash Bros Melee with the really floaty jump and low friction. 
 - Sharp (Use `5` to toggle preset)
-    - This preset has high speed and acceleration values alongside a high friction value. This gives the player a large amount of speed, but remains controllable especially on ground. From testing this preset is most similar to the movement of Super Meat Boy(High speed but still requires precise movements to avoid obstacles). This also has high jump accel and gravity for the purpose of precise platforming. 
+    - This preset has high speed and acceleration values alongside a high friction value. This gives the player a large amount of speed, but remains controllable. From testing this preset is most similar to the movement of Super Meat Boy(High speed but still requires precise movements to avoid obstacles). The high acceleration allows for quick adjustments to help avoid hazards. This also has high jump accel and gravity for the purpose of precise platforming. 
 
