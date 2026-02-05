@@ -51,6 +51,7 @@ class Game:
     
     SLAM_FALL_REQUIREMENT = 50.0
     JUMPS = 1
+    MULTI_JUMP_DIMINISH = 0.75
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode((self.SCREEN_W, self.SCREEN_H))
@@ -77,6 +78,7 @@ class Game:
         self.on_ground = True
         self.jump_requested = False
         self.jumps_left = self.JUMPS
+        self.jump_dimish_factor = self.MULTI_JUMP_DIMINISH
 
         self.control_scheme = ControlScheme.WASD
         self.debug = False
@@ -109,6 +111,24 @@ class Game:
                 jump_speed=820.0,
                 slam_speed = 2000.0
             ),
+            FeelPreset(
+                name="icey",
+                accel=2600.0,
+                max_speed=500.0,
+                friction=1.2,
+                gravity=1200.0,
+                jump_speed=720.0,
+                slam_speed = 1500.0
+            ),
+            FeelPreset(
+                name="sharp",
+                accel=3800.0,
+                max_speed=640.0,
+                friction=18.0,
+                gravity= 3400.0,
+                jump_speed= 1200.0,
+                slam_speed = 1500.0
+            )
         ]
         self.preset_idx = 0
 
@@ -184,6 +204,12 @@ class Game:
             return
         if event.key == pygame.K_3:
             self.preset_idx = 2
+            return
+        if event.key == pygame.K_4:
+            self.preset_idx = 3
+            return
+        if event.key == pygame.K_5:
+            self.preset_idx = 4
             return
 
         if self.state != "play":
@@ -297,6 +323,8 @@ class Game:
             self.on_ground = True
             #Reset multi-jumps when player touches ground
             self.jumps_left = self.JUMPS
+            self.player_rect = pygame.Rect(self.player_rect.x, self.player_rect.y, self.PLAYER_SIZE, self.PLAYER_SIZE)
+
 
         # Prevent leaving the top of the playfield.
         if self.player_rect.top < self.playfield.top:
@@ -366,6 +394,7 @@ class Game:
     def _try_slam(self) -> None:
         if self.platformer_mode and not self.on_ground and self.player_vel.y > -50:
             self.player_vel.y += self.preset.slam_speed 
+            self.player_rect = pygame.Rect(self.player_rect.x, self.player_rect.y, self.PLAYER_SIZE / 1.5, self.PLAYER_SIZE * 1.2)
 
     def update(self, dt: float) -> None:
         if self.state != "play":
@@ -390,7 +419,7 @@ class Game:
                 self.player_vel.y = -p.jump_speed
                 self.on_ground = False
             elif self.jump_requested and self.jumps_left > 0 and not self.on_ground:
-                self.player_vel.y = -p.jump_speed * 0.75
+                self.player_vel.y = -p.jump_speed * self.jump_dimish_factor
                 self.jumps_left -= 1
 
             self.jump_requested = False
@@ -498,5 +527,5 @@ class Game:
         if self.state == "title":
             self._draw_center_message(
                 "Week 3",
-                "Space: start   Shift: dash   1/2/3: feel   C: scheme   P: mode   F1: debug",
+                "Space: start   Shift: dash   1/2/3/4/5: feel   C: scheme   P: mode   F1: debug   W/I/Up Arrow: jump   S/K/Down Arrow: slam",
             )
