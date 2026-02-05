@@ -50,6 +50,7 @@ class Game:
     DASH_COOLDOWN = 0.65
     
     SLAM_FALL_REQUIREMENT = 50.0
+    JUMPS = 1
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode((self.SCREEN_W, self.SCREEN_H))
@@ -65,7 +66,7 @@ class Game:
         )
 
         self.boundary_mode = BoundaryMode.CLAMP
-        self.platformer_mode = False
+        self.platformer_mode = True
         self.state = "title"  # title | play
 
         self.player_rect = pygame.Rect(0, 0, self.PLAYER_SIZE, self.PLAYER_SIZE)
@@ -75,6 +76,7 @@ class Game:
 
         self.on_ground = True
         self.jump_requested = False
+        self.jumps_left = self.JUMPS
 
         self.control_scheme = ControlScheme.WASD
         self.debug = False
@@ -293,6 +295,8 @@ class Game:
             self.player_rect.bottom = self.playfield.bottom
             self.player_vel.y = 0
             self.on_ground = True
+            #Reset multi-jumps when player touches ground
+            self.jumps_left = self.JUMPS
 
         # Prevent leaving the top of the playfield.
         if self.player_rect.top < self.playfield.top:
@@ -385,6 +389,10 @@ class Game:
             if self.jump_requested and self.on_ground:
                 self.player_vel.y = -p.jump_speed
                 self.on_ground = False
+            elif self.jump_requested and self.jumps_left > 0 and not self.on_ground:
+                self.player_vel.y = -p.jump_speed * 0.75
+                self.jumps_left -= 1
+
             self.jump_requested = False
 
             # Gravity.
@@ -429,8 +437,8 @@ class Game:
         )
 
         dash = "READY" if self.dash_cooldown_left <= 0 else f"CD {self.dash_cooldown_left:0.2f}s"
-        right = f"Dash: {dash}"
-
+        right = f"Jumps: {self.jumps_left}     Dash: {dash}"
+       
         left_surf = self.font.render(left, True, (216, 222, 233))
         right_surf = self.font.render(right, True, (216, 222, 233))
 
