@@ -17,6 +17,10 @@ class ControlScheme(str, Enum):
     ARROWS = "ARROWS"
     IJKL = "IJKL"
 
+class Actions(str, Enum):
+    JUMP = "jump"
+    DASH = "dash"
+    SLAM = "slam"
 
 @dataclass(frozen=True)
 class FeelPreset:
@@ -30,6 +34,7 @@ class FeelPreset:
     # Platformer feel
     gravity: float
     jump_speed: float
+    slam_speed: float
 
 
 class Game:
@@ -41,8 +46,10 @@ class Game:
 
     PLAYER_SIZE = 32
 
-    DASH_IMPULSE = 760.0
+    DASH_IMPULSE = 900.0
     DASH_COOLDOWN = 0.65
+    
+    SLAM_FALL_REQUIREMENT = 50.0
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode((self.SCREEN_W, self.SCREEN_H))
@@ -80,6 +87,7 @@ class Game:
                 friction=14.0,
                 gravity=2600.0,
                 jump_speed=860.0,
+                slam_speed = 1500.0
             ),
             FeelPreset(
                 name="floaty",
@@ -88,6 +96,7 @@ class Game:
                 friction=6.0,
                 gravity=1700.0,
                 jump_speed=760.0,
+                slam_speed = 1000.0
             ),
             FeelPreset(
                 name="heavy",
@@ -96,6 +105,7 @@ class Game:
                 friction=4.2,
                 gravity=3200.0,
                 jump_speed=820.0,
+                slam_speed = 2000.0
             ),
         ]
         self.preset_idx = 0
@@ -177,12 +187,20 @@ class Game:
         if self.state != "play":
             return
 
+        actions = self._action_keys()
+
         # Discrete actions
-        if event.key in {pygame.K_LSHIFT, pygame.K_RSHIFT}:
+        if event.key in actions["DASH"]:
             self._try_dash()
             return
+        
+        # Slam action
+        if event.key in actions["SLAM"]:
+            self._try_slam()
+            return
 
-        if self.platformer_mode and event.key in {pygame.K_UP, pygame.K_w, pygame.K_SPACE}:
+
+        if self.platformer_mode and event.key in actions["JUMP"]:
             self.jump_requested = True
 
     def _scheme_keys(self) -> dict[str, set[int]]:
@@ -191,21 +209,28 @@ class Game:
                 "left": {pygame.K_a},
                 "right": {pygame.K_d},
                 "up": {pygame.K_w},
-                "down": {pygame.K_s},
+                "down": {pygame.K_s}
             }
         if self.control_scheme == ControlScheme.IJKL:
             return {
-                "left": {pygame.K_j},
+                "left": {pygame.K_j}, 
                 "right": {pygame.K_l},
                 "up": {pygame.K_i},
-                "down": {pygame.K_k},
+                "down": {pygame.K_k}
             }
         return {
             "left": {pygame.K_LEFT},
             "right": {pygame.K_RIGHT},
             "up": {pygame.K_UP},
-            "down": {pygame.K_DOWN},
+            "down": {pygame.K_DOWN}
         }
+    #Changes discrete action keys to mapping
+    def _action_keys(self) -> dict[str, set[int]]:
+        return {
+            "DASH": {pygame.K_LSHIFT, pygame.K_RSHIFT},
+            "JUMP": {pygame.K_i, pygame.K_w, pygame.K_UP},
+            "SLAM": {pygame.K_s, pygame.K_k, pygame.K_DOWN}
+     }
 
     def _read_direction(self) -> pygame.Vector2:
         keys = pygame.key.get_pressed()
@@ -222,7 +247,6 @@ class Game:
             y -= 1
         if any(keys[k] for k in mapping["down"]):
             y += 1
-
         direction = pygame.Vector2(x, y)
         if direction.length_squared() > 0:
             direction = direction.normalize()
@@ -333,6 +357,11 @@ class Game:
         # Impulse dash: a discrete action that modifies velocity once.
         self.player_vel += dash_dir * self.DASH_IMPULSE
         self.dash_cooldown_left = self.DASH_COOLDOWN
+
+    # Slam Functionality
+    def _try_slam(self) -> None:
+        if self.platformer_mode and not self.on_ground and self.player_vel.y > -50:
+            self.player_vel.y += self.preset.slam_speed 
 
     def update(self, dt: float) -> None:
         if self.state != "play":

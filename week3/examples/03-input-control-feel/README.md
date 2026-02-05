@@ -18,7 +18,8 @@ From this folder:
 - Arrow keys / WASD: move (top-down)
 - `P`: toggle platformer mode (jump + gravity)
 - `Up` / `W` / `Space`: jump (platformer mode)
-- `Left Shift`: dash (cooldown)
+- `S` / `K` / `Down Arrow`: Slam (platformer mode)
+- `Left Shift` / `Right Shift`: dash (cooldown)
 - `1` / `2` / `3`: feel preset (tight/floaty/heavy)
 - `C`: cycle control scheme (WASD / arrows / IJKL)
 - `F1`: toggle debug overlay
@@ -27,8 +28,14 @@ From this folder:
 - `Space`: start (from title)
 - `Esc`: quit
 
+
 ## What to change first
 - Try editing preset values in `input_control_feel/game.py`:
   - accel / friction / max speed
   - gravity / jump speed
 - Try changing dash cooldown or dash impulse
+
+## Additions
+- Discrete Slam Action (in platformer mode) which allows the player to slam back to the ground.
+- The player must be off ground, in platformer mode, and meeting the SLAM_FALL_REQUIREMENT
+- The constant "SLAM_FALL_REQUIREMENT" is the minimum y velocity that the player must have in order to slam. I initially had it as just 0 but this felt clunky. This is to prevent the use of slam during most of the rise of the jump. 
