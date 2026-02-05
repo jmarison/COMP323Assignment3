@@ -45,7 +45,8 @@ From this folder:
 
 ## New Presets
 - Icey (Use `4` to toggle preset) 
-    - The Main parameter changed here is the friction.  This gives a more slippery feel. I was aiming for how Luigi feels particularly in Super Smash Bros Melee with the really floaty jump and low friction. 
+    - The Main parameter changed here is the friction.  This gives a more slippery feel. I was aiming for how Luigi feels particularly in Super Smash Bros Melee with the really floaty jump and low friction. This preset can be used to help scale difficulty of a level since it makes the player more difficult to precisely control.
+    
 - Sharp (Use `5` to toggle preset)
     - This preset has high speed and acceleration values alongside a high friction value. This gives the player a large amount of speed, but remains controllable. From testing this preset is most similar to the movement of Super Meat Boy(High speed but still requires precise movements to avoid obstacles). The high acceleration allows for quick adjustments to help avoid hazards. This also has high jump accel and gravity for the purpose of precise platforming. 
 
